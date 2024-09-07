@@ -5,8 +5,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SiGoogle, SiGithub } from "react-icons/si";
+import { signIn } from "next-auth/react";
 
 const LoginSignup = () => {
+  const handleGithubSignIn = () => {
+    signIn("github", { callbackUrl: "/dashboard" });
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#201c1c]">
       <Card className="w-[350px] bg-[#100c0c]">
@@ -22,7 +27,10 @@ const LoginSignup = () => {
                   <SiGoogle size={20} />
                   <span>Login with Google</span>
                 </Button>
-                <Button className="w-full flex items-center justify-center space-x-2 bg-gray-800 text-white hover:bg-gray-700">
+                <Button
+                  className="w-full flex items-center justify-center space-x-2 bg-gray-800 text-white hover:bg-gray-700"
+                  onClick={handleGithubSignIn}
+                >
                   <SiGithub size={20} />
                   <span>Login with GitHub</span>
                 </Button>
@@ -34,7 +42,10 @@ const LoginSignup = () => {
                   <SiGoogle size={20} />
                   <span>Signup with Google</span>
                 </Button>
-                <Button className="w-full flex items-center justify-center space-x-2 bg-gray-800 text-white hover:bg-gray-700">
+                <Button
+                  className="w-full flex items-center justify-center space-x-2 bg-gray-800 text-white hover:bg-gray-700"
+                  onClick={handleGithubSignIn}
+                >
                   <SiGithub size={20} />
                   <span>Signup with GitHub</span>
                 </Button>

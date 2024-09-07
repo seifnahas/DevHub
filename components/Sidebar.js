@@ -9,6 +9,7 @@ import {
   ChevronRight,
   RectangleEllipsis,
   Server,
+  LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
@@ -37,6 +38,13 @@ const Sidebar = () => {
             ) : (
               <ChevronRight className="h-6 w-6" />
             )}
+          </Button>
+
+          <Button asChild variant="ghost" className="justify-start text-white">
+            <Link href="/dashboard" className="flex items-center space-x-2">
+              <LayoutDashboard size={24} />
+              {isOpen && <span>Dashboard</span>}
+            </Link>
           </Button>
 
           <Button asChild variant="ghost" className="justify-start text-white">
