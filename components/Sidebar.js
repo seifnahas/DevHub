@@ -10,13 +10,17 @@ import {
   RectangleEllipsis,
   Server,
   LayoutDashboard,
+  CodeIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
+import { useUser } from "@auth0/nextjs-auth0/client";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
+  const { user } = useUser();
 
   const isActive = (path) => pathname === path;
 
@@ -28,6 +32,20 @@ const Sidebar = () => {
         } bg-[#100c0c] h-full min-h-screen transform transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}
       >
         <div className="flex flex-col h-full p-4 space-y-4">
+          {/* Profile Section */}
+          <div className="flex items-center space-x-4">
+            <Avatar>
+              <AvatarImage src={user?.picture} alt={user?.name} />
+              <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+            </Avatar>
+            {isOpen && (
+              <div className="text-white">
+                <p>{user?.name}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Toggle Button */}
           <Button
             variant="ghost"
             className="justify-start text-white"
@@ -40,6 +58,7 @@ const Sidebar = () => {
             )}
           </Button>
 
+          {/* Sidebar Links */}
           <Button asChild variant="ghost" className="justify-start text-white">
             <Link href="/dashboard" className="flex items-center space-x-2">
               <LayoutDashboard size={24} />
@@ -61,6 +80,13 @@ const Sidebar = () => {
             <Link href="/json-tools" className="flex items-center space-x-2">
               <Braces size={24} />
               {isOpen && <span>JSON Tools</span>}
+            </Link>
+          </Button>
+
+          <Button asChild variant="ghost" className="justify-start text-white">
+            <Link href="/code-snippets" className="flex items-center space-x-2">
+              <CodeIcon size={24} />
+              {isOpen && <span>Code Snippets</span>}
             </Link>
           </Button>
 

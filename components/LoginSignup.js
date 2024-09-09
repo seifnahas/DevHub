@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SiGoogle, SiGithub } from "react-icons/si";
-import { signIn } from "next-auth/react";
 
 const LoginSignup = () => {
   const handleGithubSignIn = () => {
