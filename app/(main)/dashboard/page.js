@@ -18,18 +18,27 @@ import {
   LogOutIcon,
 } from "lucide-react";
 import PasswordGenerator from "@/components/PasswordGenerator";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
+
 import GithubProfileCard from "@/components/GithubProfileCard";
 
 export default function Dashboard() {
-  const { user } = useUser();
+  const { data: session, status } = useSession();
 
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        Loading...
-      </div>
-    );
+  useEffect(() => {
+    if (status === "authenticated") {
+      console.log("User session:", session.user);
+      console.log("GitHub username:", session.user.username);
+    }
+  }, [status, session]);
+
+  if (status === "loading") {
+    return <p>Loading...</p>; // You can replace this with a loader component if needed
+  }
+
+  if (!session) {
+    return <p>No session found. Please sign in.</p>; // Handle case where there is no session
   }
 
   return (
@@ -38,20 +47,22 @@ export default function Dashboard() {
 
       <div className="max-w-6xl mx-auto space-y-8 mt-8">
         <header className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold">Welcome, {user.name}</h1>
-          <Button asChild variant="ghost" size="icon">
-            <Link href="/api/auth/logout">
-              <LogOutIcon className="h-5 w-5" />
-              <span className="sr-only">Log out</span>
-            </Link>
+          <h1 className="text-4xl font-bold">Welcome, {session.user.name}</h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
+            <LogOutIcon className="h-5 w-5" />
+            <span className="sr-only">Log out</span>
           </Button>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <GithubProfileCard
-            nickname={user.nickname}
-            picture={user.picture}
-            name={user.name}
+            nickname={session.user.username} // GitHub login (username)
+            picture={session.user.image}
+            name={session.user.name}
           />
 
           <Card className="md:col-span-2">
@@ -92,8 +103,6 @@ export default function Dashboard() {
         </div>
       </div>
       <PasswordGenerator />
-
-      <a href="/api/auth/logout">Logout</a>
     </div>
   );
 }

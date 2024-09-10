@@ -20,7 +20,6 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(true);
   const pathname = usePathname();
-  const { user } = useUser();
 
   const isActive = (path) => pathname === path;
 
@@ -35,13 +34,11 @@ const Sidebar = () => {
           {/* Profile Section */}
           <div className="flex items-center space-x-4">
             <Avatar>
-              <AvatarImage src={user?.picture} alt={user?.name} />
-              <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+              {/* <AvatarImage src={user?.picture} alt={user?.name} /> */}
+              {/* <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback> */}
             </Avatar>
             {isOpen && (
-              <div className="text-white">
-                <p>{user?.name}</p>
-              </div>
+              <div className="text-white">{/* <p>{user?.name}</p> */}</div>
             )}
           </div>
 

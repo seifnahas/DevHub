@@ -2,23 +2,24 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
-  const { user, error, isLoading } = useUser();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading) return; // Wait for loading to complete
+    if (status === "loading") return; // Wait for loading to complete
 
-    if (user) {
+    if (session) {
       // If the user is authenticated, redirect to /dashboard
       router.push("/dashboard");
     } else {
       // If the user is not authenticated, redirect to /access
-      router.push("/api/auth/login");
+      router.push("/access");
     }
-  }, [user, isLoading, router]);
+  }, [session, status, router]);
 
   // Optionally return some loading state while redirecting
+  return null;
 }
