@@ -1,7 +1,6 @@
-// app/api/auth/[...nextauth]/route.js
-
 import NextAuth from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
+import { saveOrUpdateUser } from "@/lib/userService"; // Import the new utility function
 
 export const authOptions = {
   providers: [
@@ -9,38 +8,41 @@ export const authOptions = {
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
       authorization: {
-        url: "https://github.com/login/oauth/authorize",
         params: { scope: "read:user user:email" },
-      },
-      profile(profile) {
-        return {
-          id: profile.id.toString(),
-          name: profile.name ?? profile.login,
-          email: profile.email,
-          image: profile.avatar_url,
-          username: profile.login,
-        };
       },
     }),
   ],
   callbacks: {
-    async session({ session, token, user }) {
-      // Attach the username to the session object
-      if (token?.username) {
-        session.user.username = token.username;
+    async signIn({ user, account, profile }) {
+      if (account.provider === "github") {
+        try {
+          // Use the utility function to save or update the user
+          const dbUser = await saveOrUpdateUser(profile);
+
+          // Add the user ID and username to the user object
+          user.id = dbUser._id;
+          user.username = profile.login;
+        } catch (error) {
+          console.error("Error saving user to database:", error);
+          return false;
+        }
       }
+      return true;
+    },
+    async session({ session, token }) {
+      session.user.id = token.sub;
+      session.user.username = token.username;
       return session;
     },
     async jwt({ token, user, account, profile }) {
-      // Save the username in the token
       if (profile) {
-        token.username = profile.login; // GitHub login (username)
+        token.username = profile.login;
       }
       return token;
     },
   },
   pages: {
-    signIn: "/access", // Define your custom sign-in page
+    signIn: "/access",
   },
 };
 

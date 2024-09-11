@@ -12,6 +12,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSession } from "next-auth/react";
 
 const RegexTester = () => {
   const [regex, setRegex] = useState("");
@@ -21,12 +23,31 @@ const RegexTester = () => {
   const [replaceResult, setReplaceResult] = useState("");
   const [error, setError] = useState("");
   const [flags, setFlags] = useState({ g: true, i: false, m: false });
+  const [recentTests, setRecentTests] = useState([]);
+  const { data: session } = useSession();
 
   useEffect(() => {
-    handleRegexTest();
-  }, [regex, testString, flags]);
+    if (session) {
+      fetchRecentTests();
+    }
+  }, [session]);
 
-  const handleRegexTest = () => {
+  const fetchRecentTests = async () => {
+    try {
+      const response = await fetch("/api/regex-tests");
+      if (response.ok) {
+        const data = await response.json();
+        setRecentTests(data);
+      } else {
+        throw new Error("Failed to fetch recent tests");
+      }
+    } catch (error) {
+      console.error("Error fetching recent tests:", error);
+      setError("Failed to fetch recent tests. Please try again later.");
+    }
+  };
+
+  const handleRegexTest = async () => {
     setError("");
     setMatchResult([]);
     setReplaceResult("");
@@ -45,9 +66,56 @@ const RegexTester = () => {
       if (replaceString) {
         setReplaceResult(testString.replace(regexObj, replaceString));
       }
+
+      if (session) {
+        await saveRegexTest();
+      }
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const saveRegexTest = async () => {
+    try {
+      const response = await fetch("/api/regex-tests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ regex, testString }),
+      });
+
+      if (response.ok) {
+        await fetchRecentTests();
+      } else {
+        throw new Error("Failed to save regex test");
+      }
+    } catch (error) {
+      console.error("Error saving regex test:", error);
+      setError("Failed to save regex test. Please try again later.");
+    }
+  };
+
+  const handleDeleteTest = async (testId) => {
+    try {
+      const response = await fetch(`/api/regex-tests?testId=${testId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        await fetchRecentTests();
+      } else {
+        throw new Error("Failed to delete regex test");
+      }
+    } catch (error) {
+      console.error("Error deleting regex test:", error);
+      setError("Failed to delete regex test. Please try again later.");
+    }
+  };
+
+  const handleLoadRecentTest = (test) => {
+    setRegex(test.regex);
+    setTestString(test.testString);
   };
 
   const handleCopyToClipboard = (text) => {
@@ -69,6 +137,11 @@ const RegexTester = () => {
         <CardTitle>Regex Tester</CardTitle>
       </CardHeader>
       <CardContent>
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         <div className="space-y-4">
           <div>
             <Textarea
@@ -120,16 +193,12 @@ const RegexTester = () => {
             onChange={(e) => setReplaceString(e.target.value)}
           />
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+          <Button onClick={handleRegexTest}>Test Regex</Button>
 
-          <div className="space-y-2">
-            <h3 className="text-lg font-semibold">Match Results:</h3>
-            {matchResult.length > 0 ? (
-              matchResult.map((match, index) => (
+          {matchResult.length > 0 && (
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Match Results:</h3>
+              {matchResult.map((match, index) => (
                 <div key={index} className="bg-secondary p-2 rounded">
                   <p>
                     Match {index + 1}: {match[0]}
@@ -142,11 +211,9 @@ const RegexTester = () => {
                       </p>
                     ))}
                 </div>
-              ))
-            ) : (
-              <p>No matches found</p>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
 
           {replaceResult && (
             <div className="space-y-2">
@@ -164,6 +231,48 @@ const RegexTester = () => {
             </Button>
             <Button onClick={handleClearAll}>Clear All</Button>
           </div>
+
+          {session && (
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Recent Tests:</h3>
+              <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+                {recentTests.length > 0 ? (
+                  recentTests.map((test) => (
+                    <div
+                      key={test._id}
+                      className="mb-4 p-2 bg-secondary rounded-md"
+                    >
+                      <p className="font-mono text-sm">Regex: {test.regex}</p>
+                      <p className="text-sm truncate">
+                        Test String: {test.testString}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(test.timestamp).toLocaleString()}
+                      </p>
+                      <div className="flex space-x-2 mt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleLoadRecentTest(test)}
+                        >
+                          Load
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteTest(test._id)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>No recent tests found.</p>
+                )}
+              </ScrollArea>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
