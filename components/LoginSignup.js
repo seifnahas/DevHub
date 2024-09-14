@@ -34,7 +34,7 @@ const LoginSignup = () => {
           </div>
           {/* Explicitly set the color to match */}
           <CardTitle className="text-2xl font-bold text-center text-muted-foreground">
-            Welcome
+            Welcome to Devhub!
           </CardTitle>
           <CardDescription className="text-center">
             Login or sign up with your GitHub account

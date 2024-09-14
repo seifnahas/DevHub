@@ -82,12 +82,15 @@ const APITester = () => {
             <AccordionTrigger>Headers</AccordionTrigger>
             <AccordionContent>
               <Textarea
-                placeholder="Enter headers as JSON"
-                value={JSON.stringify(headers, null, 2)}
+                placeholder='Enter headers as JSON (e.g. {"Content-Type": "application/json"})'
+                value={JSON.stringify(headers, null, 2)} // This will display the current headers state
                 onChange={(e) => {
+                  const input = e.target.value;
                   try {
-                    setHeaders(JSON.parse(e.target.value));
-                  } catch {}
+                    setHeaders(JSON.parse(input)); // Parse JSON input and set the headers state
+                  } catch (error) {
+                    // You can handle invalid JSON here if needed, or provide user feedback
+                  }
                 }}
               />
             </AccordionContent>

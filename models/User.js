@@ -17,6 +17,12 @@ const UserSchema = new mongoose.Schema(
         ref: "RegexTest",
       },
     ],
+    codeSnippets: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CodeSnippet",
+      },
+    ],
   },
   { timestamps: true }
 );

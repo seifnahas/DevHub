@@ -11,6 +11,7 @@ import {
   Server,
   LayoutDashboard,
   CodeIcon,
+  Regex,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
@@ -89,7 +90,7 @@ const Sidebar = () => {
 
           <Button asChild variant="ghost" className="justify-start text-white">
             <Link href="/regex-tester" className="flex items-center space-x-2">
-              <FileJson size={24} />
+              <Regex size={24} />
               {isOpen && <span>Regex Tester</span>}
             </Link>
           </Button>

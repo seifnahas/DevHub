@@ -16,6 +16,15 @@ import {
   BookmarkIcon,
   SettingsIcon,
   LogOutIcon,
+  Sigma,
+  Braces,
+  FileJson,
+  ChevronLeft,
+  ChevronRight,
+  RectangleEllipsis,
+  Server,
+  LayoutDashboard,
+  Regex,
 } from "lucide-react";
 import PasswordGenerator from "@/components/PasswordGenerator";
 import { useSession } from "next-auth/react";
@@ -34,11 +43,11 @@ export default function Dashboard() {
   }, [status, session]);
 
   if (status === "loading") {
-    return <p>Loading...</p>; // You can replace this with a loader component if needed
+    return <p>Loading...</p>;
   }
 
   if (!session) {
-    return <p>No session found. Please sign in.</p>; // Handle case where there is no session
+    return <p>No session found. Please sign in.</p>;
   }
 
   return (
@@ -86,18 +95,23 @@ export default function Dashboard() {
               <Button
                 variant="outline"
                 className="h-24 flex flex-col items-center justify-center"
+                asChild
               >
-                <BookmarkIcon className="h-8 w-8 mb-2" />
-                Bookmarks
+                <Link href="/regex-tester">
+                  <Regex className="h-8 w-8 mb-2" />
+                  Regex Tester
+                </Link>
               </Button>
               <Button
                 variant="outline"
                 className="h-24 flex flex-col items-center justify-center"
+                asChild
               >
-                <SettingsIcon className="h-8 w-8 mb-2" />
-                Settings
+                <Link href="/api-tester">
+                  <Server className="h-8 w-8 mb-2" />
+                  API Tester
+                </Link>
               </Button>
-              {/* Add more tool buttons as needed */}
             </CardContent>
           </Card>
         </div>
