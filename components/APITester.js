@@ -74,10 +74,11 @@ const APITester = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">API Tester</h1>
-
-      <div className="space-y-4">
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>API Tester</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
         <Select value={method} onValueChange={setMethod}>
           <SelectTrigger>
             <SelectValue placeholder="Select method" />
@@ -171,8 +172,8 @@ const APITester = () => {
             </CardContent>
           </Card>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

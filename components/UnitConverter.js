@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -9,16 +9,17 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
+import { ArrowLeftRight, Copy, RefreshCw } from "lucide-react";
+import { handleConvert } from "@/utils/converter";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ArrowLeftRight, Copy, RefreshCw } from "lucide-react";
-import { handleConvert } from "@/utils/converter";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const unitTypes = [
   { value: "length", label: "Length" },
@@ -84,7 +85,7 @@ const UnitConverter = () => {
       setError("Conversion failed");
       setResult("");
     }
-  }, [inputValue, fromUnit, toUnit]); // Dependencies for useCallback
+  }, [inputValue, fromUnit, toUnit]);
 
   const handleSwap = () => {
     setFromUnit(toUnit);
@@ -108,96 +109,101 @@ const UnitConverter = () => {
   }, [inputValue, fromUnit, toUnit, handleConvertResult]);
 
   return (
-    <div className="p-6 max-w-md mx-auto  rounded-xl shadow-md space-y-4">
-      <Select onValueChange={setUnitType} value={unitType}>
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select unit type" />
-        </SelectTrigger>
-        <SelectContent>
-          {unitTypes.map((type) => (
-            <SelectItem key={type.value} value={type.value}>
-              {type.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <div className="flex space-x-2 items-center">
-        <Select onValueChange={setFromUnit} value={fromUnit}>
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>Unit Converter</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Select onValueChange={setUnitType} value={unitType}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="From" />
+            <SelectValue placeholder="Select unit type" />
           </SelectTrigger>
           <SelectContent>
-            {unitOptions[unitType].map((unit) => (
-              <SelectItem key={unit.value} value={unit.value}>
-                {unit.label}
+            {unitTypes.map((type) => (
+              <SelectItem key={type.value} value={type.value}>
+                {type.label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
-        <Button onClick={handleSwap} size="icon">
-          <ArrowLeftRight className="h-4 w-4" />
-        </Button>
+        <div className="flex space-x-2 items-center">
+          <Select onValueChange={setFromUnit} value={fromUnit}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="From" />
+            </SelectTrigger>
+            <SelectContent>
+              {unitOptions[unitType].map((unit) => (
+                <SelectItem key={unit.value} value={unit.value}>
+                  {unit.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        <Select onValueChange={setToUnit} value={toUnit}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="To" />
-          </SelectTrigger>
-          <SelectContent>
-            {unitOptions[unitType].map((unit) => (
-              <SelectItem key={unit.value} value={unit.value}>
-                {unit.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          <Button onClick={handleSwap} size="icon" variant="outline">
+            <ArrowLeftRight className="h-4 w-4" />
+          </Button>
 
-      <div className="space-y-2">
-        <Input
-          type="number"
-          placeholder="Enter value"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
-        <Slider
-          min={0}
-          max={1000}
-          step={1}
-          value={[parseFloat(inputValue) || 0]}
-          onValueChange={(value) => setInputValue(value[0].toString())}
-        />
-      </div>
+          <Select onValueChange={setToUnit} value={toUnit}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="To" />
+            </SelectTrigger>
+            <SelectContent>
+              {unitOptions[unitType].map((unit) => (
+                <SelectItem key={unit.value} value={unit.value}>
+                  {unit.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-      <Input type="text" placeholder="Result" value={result} readOnly />
+        <div className="space-y-2">
+          <Input
+            type="number"
+            placeholder="Enter value"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+          <Slider
+            min={0}
+            max={1000}
+            step={1}
+            value={[parseFloat(inputValue) || 0]}
+            onValueChange={(value) => setInputValue(value[0].toString())}
+          />
+        </div>
 
-      <div className="flex space-x-2">
-        <Button onClick={handleClear} variant="outline">
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Clear
-        </Button>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button onClick={handleCopy}>
-                <Copy className="h-4 w-4 mr-2" />
-                Copy
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Copy result to clipboard</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+        <Input type="text" placeholder="Result" value={result} readOnly />
 
-      {error && (
-        <Alert variant="destructive">
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-    </div>
+        <div className="flex space-x-2">
+          <Button onClick={handleClear} variant="outline">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Clear
+          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button onClick={handleCopy}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Copy result to clipboard</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

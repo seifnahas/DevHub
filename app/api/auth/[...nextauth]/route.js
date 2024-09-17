@@ -16,10 +16,8 @@ export const authOptions = {
     async signIn({ user, account, profile }) {
       if (account.provider === "github") {
         try {
-          // Use the utility function to save or update the user
           const dbUser = await saveOrUpdateUser(profile);
 
-          // Add the user ID and username to the user object
           user.id = dbUser._id;
           user.username = profile.login;
         } catch (error) {
