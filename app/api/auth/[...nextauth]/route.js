@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
-import { saveOrUpdateUser } from "@/lib/userService"; // Import the new utility function
+import { saveOrUpdateUser } from "@/lib/userService";
 
 export const authOptions = {
   providers: [
