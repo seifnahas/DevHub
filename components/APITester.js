@@ -22,7 +22,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 const APITester = () => {
   const [method, setMethod] = useState("GET");
   const [url, setUrl] = useState("");
-  const [headers, setHeaders] = useState({});
+  const [headers, setHeaders] = useState([{ key: "", value: "" }]);
   const [body, setBody] = useState("");
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
@@ -31,11 +31,16 @@ const APITester = () => {
     setError(null);
     setResponse(null);
 
+    const headerObject = headers.reduce((acc, { key, value }) => {
+      if (key && value) acc[key] = value;
+      return acc;
+    }, {});
+
     try {
       const res = await fetch("/api/api-tester", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ method, url, headers, body }),
+        body: JSON.stringify({ method, url, headers: headerObject, body }),
       });
 
       const data = await res.json();
@@ -48,10 +53,24 @@ const APITester = () => {
   const handleClear = () => {
     setMethod("GET");
     setUrl("");
-    setHeaders({});
+    setHeaders([{ key: "", value: "" }]);
     setBody("");
     setResponse(null);
     setError(null);
+  };
+
+  const addHeader = () => {
+    setHeaders([...headers, { key: "", value: "" }]);
+  };
+
+  const updateHeader = (index, field, value) => {
+    const newHeaders = [...headers];
+    newHeaders[index][field] = value;
+    setHeaders(newHeaders);
+  };
+
+  const removeHeader = (index) => {
+    setHeaders(headers.filter((_, i) => i !== index));
   };
 
   return (
@@ -81,18 +100,31 @@ const APITester = () => {
           <AccordionItem value="headers">
             <AccordionTrigger>Headers</AccordionTrigger>
             <AccordionContent>
-              <Textarea
-                placeholder='Enter headers as JSON (e.g. {"Content-Type": "application/json"})'
-                value={JSON.stringify(headers, null, 2)} // This will display the current headers state
-                onChange={(e) => {
-                  const input = e.target.value;
-                  try {
-                    setHeaders(JSON.parse(input)); // Parse JSON input and set the headers state
-                  } catch (error) {
-                    // You can handle invalid JSON here if needed, or provide user feedback
-                  }
-                }}
-              />
+              {headers.map((header, index) => (
+                <div key={index} className="flex space-x-2 mb-2">
+                  <Input
+                    placeholder="Key"
+                    value={header.key}
+                    onChange={(e) => updateHeader(index, "key", e.target.value)}
+                  />
+                  <Input
+                    placeholder="Value"
+                    value={header.value}
+                    onChange={(e) =>
+                      updateHeader(index, "value", e.target.value)
+                    }
+                  />
+                  <Button
+                    onClick={() => removeHeader(index)}
+                    variant="destructive"
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+              <Button onClick={addHeader} variant="outline">
+                Add Header
+              </Button>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

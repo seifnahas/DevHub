@@ -33,15 +33,6 @@ const Sidebar = () => {
       >
         <div className="flex flex-col h-full p-4 space-y-4">
           {/* Profile Section */}
-          <div className="flex items-center space-x-4">
-            <Avatar>
-              {/* <AvatarImage src={user?.picture} alt={user?.name} /> */}
-              {/* <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback> */}
-            </Avatar>
-            {isOpen && (
-              <div className="text-white">{/* <p>{user?.name}</p> */}</div>
-            )}
-          </div>
 
           {/* Toggle Button */}
           <Button
